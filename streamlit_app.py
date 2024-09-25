@@ -5,8 +5,6 @@ import os
 load_dotenv()
 
 SERVER_URL = os.getenv("SERVER_URL")
-submit_url = f"{SERVER_URL}/api/search"
-submit_url = f"{SERVER_URL}/api/regi"
 
 st.set_page_config(
     page_title="CriminalLens",
@@ -18,7 +16,7 @@ st.set_page_config(
 st.title(":eyeglasses: CriminalLens")
 
 st.sidebar.header(":eyeglasses: Welcome to CriminalLens")
-sel_menu = st.sidebar.radio("Select menu", ["How to use", "Search", "Regi Criminal", "Rate Plan", "About"])
+sel_menu = st.sidebar.radio("Select menu", ["How to use", "View criminals", "Search Criminal", "Regi Criminal", "Rate Plan", "About"])
 
 if sel_menu == "How to use":
     st.header("How to use?")
@@ -31,7 +29,13 @@ if sel_menu == "How to use":
     st.write("")
     st.write("The feature is not implemented yet ...")
 
-elif sel_menu == "Search":
+elif sel_menu == "View criminals":
+    st.header("View criminals")
+    st.write("The feature is not implemented yet ...")
+
+elif sel_menu == "Search Criminal":
+    submit_url = f"{SERVER_URL}/api/search"
+    
     st.header("Search Criminal")
     
     upload_type = st.radio("Select upload type", ["Upload image", "Take a picture"])
@@ -45,6 +49,7 @@ elif sel_menu == "Search":
             st.image(picture)
             criminal_image = picture
 
+    st.write("Uploaded photos will be deleted immediately after processing.")
     submit_button = st.button(label='Search')
     
     if submit_button:
@@ -67,8 +72,9 @@ elif sel_menu == "Search":
             
 
 elif sel_menu == "Regi Criminal":
-    st.header("Regi Criminal")
+    submit_url = f"{SERVER_URL}/api/regi"
     
+    st.header("Registration Criminal")
     criminal_name = st.text_input("Criminal name")
     criminal_desc = st.text_input("Criminal Desc")
     upload_type = st.radio("Select upload type", ["Upload image", "Take a picture"])
@@ -81,6 +87,9 @@ elif sel_menu == "Regi Criminal":
         if picture:
             st.image(picture)
             criminal_image = picture
+    
+    st.write("The information you upload will be stored only for processing purposes. The information you upload may be shared. Do not upload important information. We cannot be held responsible.")
+    agree_ckbox = st.checkbox("I understand and agree")
 
     submit_button = st.button(label='Register')
     
@@ -91,6 +100,8 @@ elif sel_menu == "Regi Criminal":
             st.error("Please enter the criminal desc.")
         elif criminal_image == None:
             st.error("Please upload or take a picture of the criminal.")
+        elif not agree_ckbox:
+            st.error("Please agree to the terms.")
         else:
             st.warning("Registering...")
             
