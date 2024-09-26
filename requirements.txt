@@ -1,0 +1,4 @@
+python-dotenv
+requests
+base64
+streamlit
