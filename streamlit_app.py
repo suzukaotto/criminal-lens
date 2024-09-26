@@ -1,10 +1,13 @@
-import streamlit as st
-import requests
-from dotenv import load_dotenv
+import base64
 import os
+import requests
+import streamlit as st
+from dotenv import load_dotenv
+import src.utils as utils
 load_dotenv()
 
 SERVER_URL = os.getenv("SERVER_URL")
+TEMP_DIR = os.path.join(os.getcwd(), "src", "temp_dir")
 
 st.set_page_config(
     page_title="CriminalLens",
@@ -30,8 +33,43 @@ if sel_menu == "How to use":
     st.write("The feature is not implemented yet ...")
 
 elif sel_menu == "View criminals":
+    submit_url = f"{SERVER_URL}/api/list"
+    
     st.header("View criminals")
-    st.write("The feature is not implemented yet ...")
+    # try:
+    st.warning("Loading list of criminals...")
+    
+    res = requests.get(submit_url, timeout=10)
+    res_json = res.json()
+    
+    if res_json.get('error', True):
+        st.error(f"Loading failed: {res_json.get('detail', 'Unknown error')}")
+    else:
+        st.success(f"Loading successful: {res_json.get('detail', 'Unknown result')}")
+        
+        res_json = res_json['data']
+        if res_json == []:
+            st.write("No criminals registered.")
+            
+        else:
+            crimi_layout_cell = []
+            for i in range((len(res_json) + 2) // 3):
+                crimi_layout_cell.append(st.columns(3))
+
+            crimi_layout_cell = [col for row in crimi_layout_cell for col in row]
+
+            for index, criminal in enumerate(res_json):
+                crimi_layout_cell[index].write(f"Name: {criminal['crimi_name']}")
+                crimi_layout_cell[index].write(f"Desc: {criminal['crimi_desc']}")
+                with open(TEMP_DIR, 'view_temp.jpg', 'wb') as f:
+                    f.write(base64.b64decode(criminal['crimi_face'][0]))
+                crimi_layout_cell[index].image(open(TEMP_DIR, 'view_temp.jpg', 'wb'), caption=f"Regi time: {criminal['regi_time']}", use_column_width=True)
+                crimi_layout_cell[index].write("")
+        
+        os.remove(os.path.join(TEMP_DIR, 'view_temp.jpg'))
+                
+    # except Exception as e:
+    #     st.error("Failed to load criminals. Are you connected to the Internet?")
 
 elif sel_menu == "Search Criminal":
     submit_url = f"{SERVER_URL}/api/search"
@@ -40,7 +78,7 @@ elif sel_menu == "Search Criminal":
     
     upload_type = st.radio("Select upload type", ["Upload image", "Take a picture"])
 
-    upload_type = None
+    criminal_image = None
     if upload_type == "Upload image":
         criminal_image = st.file_uploader("Criminal image")
     else:
@@ -59,14 +97,44 @@ elif sel_menu == "Search Criminal":
             st.warning("Searching...")
             
             try:
-                res = requests.post(submit_url, timeout=10, files={'image': criminal_image})
-                res_content = res.json()
+                res = requests.post(submit_url, timeout=10, files={"image": criminal_image})
+                res_json = res.json()
                 
-                if res_content.get('error', True):
-                    st.error(f"Search failed: {res_content.get('detail', 'Unknown error')}")
+                if res_json.get("error", True):
+                    st.error(f"Search failed: {res_json.get("detail", "Unknown error")}")
                 else:
-                    print(res_content)
-                    st.success(f"Search successful: {res_content.get('detail', 'Unknown result')}")
+                    st.success(f"Search successful: {res_json.get("detail", "Unknown result")}")
+                    
+                    similar_layout_cell = []
+                    for i in range((len(res_json["similar_info"]) + 2 + 3) // 3):
+                        similar_layout_cell.append(st.columns(3))
+                    similar_layout_cell = [col for row in similar_layout_cell for col in row]
+                    
+                    suspect_layout_cell = []
+                    for i in range((len(res_json["suspect_info"]) + 2 + 3) // 3):
+                        suspect_layout_cell.append(st.columns(3))
+                    suspect_layout_cell = [col for row in suspect_layout_cell for col in row]
+                    
+                    similar_layout_cell[0].header("Similar")
+                    for index, criminal in enumerate(res_json["similar_info"]):
+                        similar_layout_cell[index+3].write(f"Name: {criminal['crimi_name']}")
+                        similar_layout_cell[index+3].write(f"Desc: {criminal['crimi_desc']}")
+                        with open(os.path.join(TEMP_DIR, 'search_temp.jpg'), 'wb') as f:
+                            f.write(base64.b64decode(criminal['crimi_face']))
+                        similar_layout_cell[index+3].image(os.path.join(TEMP_DIR, 'search_temp.jpg'), use_column_width=True)
+                        similar_layout_cell[index+3].write("")
+                    
+                    suspect_layout_cell[0].header("Suspect")
+                    for index, criminal in enumerate(res_json["suspect_info"]):
+                        suspect_layout_cell[index+3].write(f"Name: {criminal['crimi_name']}")
+                        suspect_layout_cell[index+3].write(f"Desc: {criminal['crimi_desc']}")
+                        with open(os.path.join(TEMP_DIR, 'search_temp.jpg'), 'wb') as f:
+                            f.write(base64.b64decode(criminal['crimi_face']))
+                        suspect_layout_cell[index+3].image(os.path.join(TEMP_DIR, 'search_temp.jpg'), use_column_width=True)
+                        suspect_layout_cell[index+3].write("")
+                    
+                    os.remove(os.path.join(TEMP_DIR, 'search_temp.jpg'))
+                    
             except Exception as e:
                 st.error(f"Search failed. Are you connected to the Internet?")
             
@@ -106,12 +174,24 @@ elif sel_menu == "Regi Criminal":
             st.warning("Registering...")
             
             try:
-                res = requests.post(submit_url, timeout=10, data={'name': criminal_name, 'desc': criminal_desc}, files={'image': criminal_image})
+                res_data = {
+                    'crimi_name' : criminal_name,
+                    'crimi_desc' : criminal_desc,
+                    'is_agree'   : agree_ckbox,
+                    'regi_time'  : utils.get_now_ftime()
+                }
+                res_file = {
+                    'crimi_image': criminal_image
+                }
                 
-                if res.status_code == 200:
-                    st.success("You have registered. Thank you!")
+                res = requests.post(submit_url, timeout=10, data=res_data, files=res_file)
+                res_json = res.json()
+                
+                if res_json.get('error', True):
+                    st.error(f"Registration failed: {res_json.get('detail', 'Unknown error')}")
                 else:
-                    st.error("Registration failed.")
+                    st.success(f"Registration successful: {res_json.get('detail', 'Unknown result')}")
+                    
             except Exception as e:
                 st.error(f"Registration failed. Are you connected to the Internet?")
 
@@ -139,7 +219,6 @@ elif sel_menu == "Rate Plan":
     col3.write("Features: Provides Premium Tier (Individual) features to all users")
     if btn_col3.button("Contact Us"):
         st.header("Please feel free to contact us for consultation.\nContact email: contact@tteokbokki.com")
-    
 
 elif sel_menu == "About":
     st.header("About")
@@ -150,3 +229,4 @@ elif sel_menu == "About":
     st.write("")
     st.write("This project is developed by Team tteokbokki.")
     st.write("Are you curious about the source code? This is our [GitHub](https://github.com/brainai-tteokbokki)")
+    
