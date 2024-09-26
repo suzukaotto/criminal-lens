@@ -61,9 +61,9 @@ elif sel_menu == "View criminals":
             for index, criminal in enumerate(res_json):
                 crimi_layout_cell[index].write(f"Name: {criminal['crimi_name']}")
                 crimi_layout_cell[index].write(f"Desc: {criminal['crimi_desc']}")
-                with open(os.path.join(TEMP_DIR, 'view_temp.jpg'), 'wb') as f:
-                    f.write(base64.b64decode(criminal['crimi_face'][0]))
-                crimi_layout_cell[index].image(os.path.join(TEMP_DIR, 'view_temp.jpg'), caption=f"Regi time: {criminal['regi_time']}", use_column_width=True)
+                # with open(os.path.join(TEMP_DIR, 'view_temp.jpg'), 'wb') as f:
+                #     f.write(base64.b64decode(criminal['crimi_face'][0]))
+                # crimi_layout_cell[index].image(os.path.join(TEMP_DIR, 'view_temp.jpg'), caption=f"Regi time: {criminal['regi_time']}", use_column_width=True)
                 crimi_layout_cell[index].write("")
         
             os.remove(os.path.join(TEMP_DIR, 'view_temp.jpg'))
@@ -119,18 +119,18 @@ elif sel_menu == "Search Criminal":
                     for index, criminal in enumerate(res_json["similar_info"]):
                         similar_layout_cell[index+3].write(f"Name: {criminal['crimi_name']}")
                         similar_layout_cell[index+3].write(f"Desc: {criminal['crimi_desc']}")
-                        with open(os.path.join(TEMP_DIR, 'search_temp.jpg'), 'wb') as f:
-                            f.write(base64.b64decode(criminal['crimi_face']))
-                        similar_layout_cell[index+3].image(os.path.join(TEMP_DIR, 'search_temp.jpg'), use_column_width=True)
+                        # with open(os.path.join(TEMP_DIR, 'search_temp.jpg'), 'wb') as f:
+                        #     f.write(base64.b64decode(criminal['crimi_face']))
+                        # similar_layout_cell[index+3].image(os.path.join(TEMP_DIR, 'search_temp.jpg'), use_column_width=True)
                         similar_layout_cell[index+3].write("")
                     
                     suspect_layout_cell[0].header("Suspect")
                     for index, criminal in enumerate(res_json["suspect_info"]):
                         suspect_layout_cell[index+3].write(f"Name: {criminal['crimi_name']}")
                         suspect_layout_cell[index+3].write(f"Desc: {criminal['crimi_desc']}")
-                        with open(os.path.join(TEMP_DIR, 'search_temp.jpg'), 'wb') as f:
-                            f.write(base64.b64decode(criminal['crimi_face']))
-                        suspect_layout_cell[index+3].image(os.path.join(TEMP_DIR, 'search_temp.jpg'), use_column_width=True)
+                        # with open(os.path.join(TEMP_DIR, 'search_temp.jpg'), 'wb') as f:
+                        #     f.write(base64.b64decode(criminal['crimi_face']))
+                        # suspect_layout_cell[index+3].image(os.path.join(TEMP_DIR, 'search_temp.jpg'), use_column_width=True)
                         suspect_layout_cell[index+3].write("")
                     
                     os.remove(os.path.join(TEMP_DIR, 'search_temp.jpg'))
