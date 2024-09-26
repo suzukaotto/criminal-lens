@@ -61,12 +61,12 @@ elif sel_menu == "View criminals":
             for index, criminal in enumerate(res_json):
                 crimi_layout_cell[index].write(f"Name: {criminal['crimi_name']}")
                 crimi_layout_cell[index].write(f"Desc: {criminal['crimi_desc']}")
-                with open(TEMP_DIR, 'view_temp.jpg', 'wb') as f:
+                with open(os.path.join(TEMP_DIR, 'view_temp.jpg'), 'wb') as f:
                     f.write(base64.b64decode(criminal['crimi_face'][0]))
-                crimi_layout_cell[index].image(open(TEMP_DIR, 'view_temp.jpg', 'wb'), caption=f"Regi time: {criminal['regi_time']}", use_column_width=True)
+                crimi_layout_cell[index].image(os.path.join(TEMP_DIR, 'view_temp.jpg'), caption=f"Regi time: {criminal['regi_time']}", use_column_width=True)
                 crimi_layout_cell[index].write("")
         
-        os.remove(os.path.join(TEMP_DIR, 'view_temp.jpg'))
+            os.remove(os.path.join(TEMP_DIR, 'view_temp.jpg'))
                 
     # except Exception as e:
     #     st.error("Failed to load criminals. Are you connected to the Internet?")
