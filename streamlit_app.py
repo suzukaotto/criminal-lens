@@ -68,10 +68,15 @@ elif sel_menu == "View criminals":
                     crimi_layout_cell[index].write(f"Name: {criminal['crimi_name']}")
                     crimi_layout_cell[index].write(f"Desc: {criminal['crimi_desc']}")
                     if criminal.get('crimi_face', None) != None:
-                        with open(os.path.join(TEMP_DIR, 'view_temp.jpg'), 'wb') as f:
-                            f.write(base64.b64decode(criminal['crimi_face'][0]))
-                        crimi_layout_cell[index].image(os.path.join(TEMP_DIR, 'view_temp.jpg'), caption=f"Regi time: {criminal['regi_time']}", use_column_width=True)
-                        os.remove(os.path.join(TEMP_DIR, 'view_temp.jpg'))
+                        try:
+                            with open(os.path.join(TEMP_DIR, 'view_temp.jpg'), 'wb') as f:
+                                f.write(base64.b64decode(criminal['crimi_face'][0]))
+                            crimi_layout_cell[index].image(os.path.join(TEMP_DIR, 'view_temp.jpg'), caption=f"Regi time: {criminal['regi_time']}", use_column_width=True)
+                            os.remove(os.path.join(TEMP_DIR, 'view_temp.jpg'))
+                        except:
+                            if os.path.exists(os.path.join(TEMP_DIR, 'view_temp.jpg')):
+                                os.remove(os.path.join(TEMP_DIR, 'view_temp.jpg'))
+                            crimi_layout_cell[index].write("Error loading image")
                     else:
                         crimi_layout_cell[index].write("No image")
                     
@@ -218,8 +223,7 @@ elif sel_menu == "Del Criminal":
     
     st.header("Delete Criminal")
     criminal_name = st.text_input("Criminal name")
-    st.write("Click the delete button, all data of the criminal registered under the entered name will be deleted from the server.")
-    st.write("and The server no longer processes information about deleted criminals.")
+    st.write("When you click the Delete button, all data of the criminal registered under the entered name will be deleted from the server. The deleted criminal will no longer be processed on the server.")
 
     submit_button = st.button(label='Delete')
     
