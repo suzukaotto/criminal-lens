@@ -28,14 +28,14 @@ sel_menu = st.sidebar.radio("Select menu", ["How to use", "View criminals", "Sea
 # How to use
 if sel_menu == "How to use":
     st.header("How to use?")
-    st.write("1. Click on 'Search' in the sidebar to search for a criminal.")
-    st.write("2. Click on 'Regi Criminal' in the sidebar to register a criminal.")
-    st.write("3. Click on 'About' in the sidebar to know more about the project.")
-    st.write(":eyeglasses: Find it!")
+    st.write("1. Click on [ View criminals ] in the sidebar to view the list of criminals registered.")
+    st.write("2. Click on [ Search Criminal ] in the sidebar to search for a criminal.")
+    st.write("3. Click on [ Regi Criminal ] in the sidebar to register a criminal.")
+    st.write("4. Click on [ Del Criminal ] in the sidebar to delete a criminal.")
+    st.write("5. Click on [ Rate Plan ] in the sidebar to view the rate plan.")
+    st.write("6. Click on [ About ] in the sidebar to know more about the project.")
     st.write("")
-    st.write("")
-    st.write("")
-    st.write("The feature is not implemented yet ...")
+    st.write(":eyeglasses: Find the criminal!")
 
 # View criminals
 elif sel_menu == "View criminals":
@@ -71,7 +71,7 @@ elif sel_menu == "View criminals":
                         try:
                             with open(os.path.join(TEMP_DIR, 'view_temp.jpg'), 'wb') as f:
                                 f.write(base64.b64decode(criminal['crimi_face'][0]))
-                            crimi_layout_cell[index].image(os.path.join(TEMP_DIR, 'view_temp.jpg'), caption=f"Regi time: {criminal['regi_time']}", use_column_width=True)
+                            crimi_layout_cell[index].image(os.path.join(TEMP_DIR, 'view_temp.jpg'), use_column_width=True)
                             os.remove(os.path.join(TEMP_DIR, 'view_temp.jpg'))
                         except:
                             if os.path.exists(os.path.join(TEMP_DIR, 'view_temp.jpg')):
@@ -80,6 +80,11 @@ elif sel_menu == "View criminals":
                     else:
                         crimi_layout_cell[index].write("No image")
                     
+                    crimi_layout_cell[index].write(f"RegiTime: {criminal['regi_time']}")
+                    crimi_layout_cell[index].write(f"RegiUser: {criminal['regi_user']}")
+                    
+                    crimi_layout_cell[index].write("")
+                    crimi_layout_cell[index].write("")
                     crimi_layout_cell[index].write("")
         
     except Exception as e:
@@ -177,8 +182,7 @@ elif sel_menu == "Regi Criminal":
             st.image(picture)
             criminal_image = picture
     
-    st.write("The information you upload will be stored only for processing purposes. The information you upload may be shared. Do not upload important information. We cannot be held responsible.")
-    agree_ckbox = st.checkbox("I understand and agree")
+    agree_ckbox = st.checkbox("The information you upload will be stored on the server for processing purposes only. The information you upload may be shared. Do not upload sensitive information. Your IP will be recorded when you register. We will not assume any legal responsibility. If you understand all of the above, please check the box next to it.")
 
     submit_button = st.button(label='Register')
     
