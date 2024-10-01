@@ -23,7 +23,7 @@ st.set_page_config(
 st.title(":eyeglasses: CriminalLens")
 
 st.sidebar.header(":eyeglasses: Welcome to CriminalLens")
-sel_menu = st.sidebar.radio("Select menu", ["How to use", "View criminals", "Search Criminal", "Regi Criminal", "Rate Plan", "About"])
+sel_menu = st.sidebar.radio("Select menu", ["How to use", "View criminals", "Search Criminal", "Regi Criminal", "Del Criminal", "Rate Plan", "About"])
 
 # How to use
 if sel_menu == "How to use":
@@ -42,43 +42,43 @@ elif sel_menu == "View criminals":
     submit_url = f"{SERVER_URL}/api/list"
     
     st.header("View criminals")
-    # try:
-    st.warning("Loading list of criminals...")
-    
-    res = requests.get(submit_url, data={"authKey": AUTH_KEY}, timeout=10)
-    res_json = res.json()
-    
-    if res_json.get('error', True):
-        st.error(f"Loading failed: {res_json.get('detail', 'Unknown error')}")
-    else:
-        st.success(f"Loading successful: {res_json.get('detail', 'Unknown result')}")
+    try:
+        st.warning("Loading list of criminals...")
         
-        res_json = res_json['data']
-        if res_json == []:
-            st.write("No criminals registered.")
+        res = requests.get(submit_url, data={"authKey": AUTH_KEY}, timeout=10)
+        res_json = res.json()
         
+        if res_json.get('error', True):
+            st.error(f"Loading failed: {res_json.get('detail', 'Unknown error')}")
         else:
-            crimi_layout_cell = []
-            for i in range((len(res_json) + 2) // 3):
-                crimi_layout_cell.append(st.columns(3))
+            st.success(f"Loading successful: {res_json.get('detail', 'Unknown result')}")
+            
+            res_json = res_json['data']
+            if res_json == []:
+                st.write("No criminals registered.")
+            
+            else:
+                crimi_layout_cell = []
+                for i in range((len(res_json) + 2) // 3):
+                    crimi_layout_cell.append(st.columns(3))
 
-            crimi_layout_cell = [col for row in crimi_layout_cell for col in row]
+                crimi_layout_cell = [col for row in crimi_layout_cell for col in row]
 
-            for index, criminal in enumerate(res_json):
-                crimi_layout_cell[index].write(f"Name: {criminal['crimi_name']}")
-                crimi_layout_cell[index].write(f"Desc: {criminal['crimi_desc']}")
-                if criminal.get('crimi_face', None) != None:
-                    with open(os.path.join(TEMP_DIR, 'view_temp.jpg'), 'wb') as f:
-                        f.write(base64.b64decode(criminal['crimi_face'][0]))
-                    crimi_layout_cell[index].image(os.path.join(TEMP_DIR, 'view_temp.jpg'), caption=f"Regi time: {criminal['regi_time']}", use_column_width=True)
-                    os.remove(os.path.join(TEMP_DIR, 'view_temp.jpg'))
-                else:
-                    crimi_layout_cell[index].write("No image")
-                
-                crimi_layout_cell[index].write("")
+                for index, criminal in enumerate(res_json):
+                    crimi_layout_cell[index].write(f"Name: {criminal['crimi_name']}")
+                    crimi_layout_cell[index].write(f"Desc: {criminal['crimi_desc']}")
+                    if criminal.get('crimi_face', None) != None:
+                        with open(os.path.join(TEMP_DIR, 'view_temp.jpg'), 'wb') as f:
+                            f.write(base64.b64decode(criminal['crimi_face'][0]))
+                        crimi_layout_cell[index].image(os.path.join(TEMP_DIR, 'view_temp.jpg'), caption=f"Regi time: {criminal['regi_time']}", use_column_width=True)
+                        os.remove(os.path.join(TEMP_DIR, 'view_temp.jpg'))
+                    else:
+                        crimi_layout_cell[index].write("No image")
+                    
+                    crimi_layout_cell[index].write("")
         
-    # except Exception as e:
-        # st.error("Failed to load criminals. Are you connected to the Internet?")
+    except Exception as e:
+        st.error("Failed to load criminals. Are you connected to the Internet?")
 
 # Search Criminal
 elif sel_menu == "Search Criminal":
@@ -106,53 +106,53 @@ elif sel_menu == "Search Criminal":
         else:
             st.warning("Searching...")
             
-            # try:
-            res = requests.post(submit_url, data={'authKey': AUTH_KEY}, files={"image": criminal_image}, timeout=10)
-            res_json = res.json()
-            
-            if res_json.get("error", True):
-                st.error(f"Search failed: {res_json.get("detail", "Unknown error")}")
-            else:
-                st.success(f"Search successful: {res_json.get("detail", "Unknown result")}")
+            try:
+                res = requests.post(submit_url, data={'authKey': AUTH_KEY}, files={"crimi_face": criminal_image}, timeout=10)
+                res_json = res.json()
                 
-                similar_layout_cell = []
-                for i in range((len(res_json["similar_info"]) + 2 + 3) // 3):
-                    similar_layout_cell.append(st.columns(3))
-                similar_layout_cell = [col for row in similar_layout_cell for col in row]
+                if res_json.get("error", True):
+                    st.error(f"Search failed: {res_json.get("detail", "Unknown error")}")
+                else:
+                    st.success(f"Search successful: {res_json.get("detail", "Unknown result")}")
+                    
+                    similar_layout_cell = []
+                    for i in range((len(res_json["similar_info"]) + 2 + 3) // 3):
+                        similar_layout_cell.append(st.columns(3))
+                    similar_layout_cell = [col for row in similar_layout_cell for col in row]
+                    
+                    suspect_layout_cell = []
+                    for i in range((len(res_json["suspect_info"]) + 2 + 3) // 3):
+                        suspect_layout_cell.append(st.columns(3))
+                    suspect_layout_cell = [col for row in suspect_layout_cell for col in row]
+                    
+                    similar_layout_cell[0].header("Similar")
+                    for index, simil_crimi in enumerate(res_json["similar_info"]):
+                        similar_layout_cell[index+3].write(f"Name: {simil_crimi['crimi_name']}")
+                        similar_layout_cell[index+3].write(f"Desc: {simil_crimi['crimi_desc']}")
+                        if simil_crimi.get('crimi_face', None) != None:
+                            with open(os.path.join(TEMP_DIR, 'search_temp.jpg'), 'wb') as f:
+                                f.write(base64.b64decode(simil_crimi['crimi_face']))
+                            similar_layout_cell[index+3].image(os.path.join(TEMP_DIR, 'search_temp.jpg'), use_column_width=True)
+                            os.remove(os.path.join(TEMP_DIR, 'search_temp.jpg'))
+                        else:
+                            similar_layout_cell[index+3].write("No image")
+                        similar_layout_cell[index+3].write("")
+                    
+                    suspect_layout_cell[0].header("Suspect")
+                    for index, sus_crimi in enumerate(res_json["suspect_info"]):
+                        suspect_layout_cell[index+3].write(f"Name: {sus_crimi['crimi_name']}")
+                        suspect_layout_cell[index+3].write(f"Desc: {sus_crimi['crimi_desc']}")
+                        if sus_crimi.get('crimi_face', None) != None:
+                            with open(os.path.join(TEMP_DIR, 'search_temp.jpg'), 'wb') as f:
+                                f.write(base64.b64decode(sus_crimi['crimi_face']))
+                            suspect_layout_cell[index+3].image(os.path.join(TEMP_DIR, 'search_temp.jpg'), use_column_width=True)
+                            os.remove(os.path.join(TEMP_DIR, 'search_temp.jpg'))
+                        else:
+                            suspect_layout_cell[index+3].write("No image")
+                        suspect_layout_cell[index+3].write("")
                 
-                suspect_layout_cell = []
-                for i in range((len(res_json["suspect_info"]) + 2 + 3) // 3):
-                    suspect_layout_cell.append(st.columns(3))
-                suspect_layout_cell = [col for row in suspect_layout_cell for col in row]
-                
-                similar_layout_cell[0].header("Similar")
-                for index, simil_crimi in enumerate(res_json["similar_info"]):
-                    similar_layout_cell[index+3].write(f"Name: {simil_crimi['crimi_name']}")
-                    similar_layout_cell[index+3].write(f"Desc: {simil_crimi['crimi_desc']}")
-                    if simil_crimi.get('crimi_face', None) != None:
-                        with open(os.path.join(TEMP_DIR, 'search_temp.jpg'), 'wb') as f:
-                            f.write(base64.b64decode(simil_crimi['crimi_face']))
-                        similar_layout_cell[index+3].image(os.path.join(TEMP_DIR, 'search_temp.jpg'), use_column_width=True)
-                        os.remove(os.path.join(TEMP_DIR, 'search_temp.jpg'))
-                    else:
-                        similar_layout_cell[index+3].write("No image")
-                    similar_layout_cell[index+3].write("")
-                
-                suspect_layout_cell[0].header("Suspect")
-                for index, sus_crimi in enumerate(res_json["suspect_info"]):
-                    suspect_layout_cell[index+3].write(f"Name: {sus_crimi['crimi_name']}")
-                    suspect_layout_cell[index+3].write(f"Desc: {sus_crimi['crimi_desc']}")
-                    if sus_crimi.get('crimi_face', None) != None:
-                        with open(os.path.join(TEMP_DIR, 'search_temp.jpg'), 'wb') as f:
-                            f.write(base64.b64decode(sus_crimi['crimi_face']))
-                        suspect_layout_cell[index+3].image(os.path.join(TEMP_DIR, 'search_temp.jpg'), use_column_width=True)
-                        os.remove(os.path.join(TEMP_DIR, 'search_temp.jpg'))
-                    else:
-                        suspect_layout_cell[index+3].write("No image")
-                    suspect_layout_cell[index+3].write("")
-                
-            # except Exception as e:
-            #     st.error(f"Search failed. Are you connected to the Internet?: {e}")
+            except Exception as e:
+                st.error(f"Search failed. Are you connected to the Internet?: {e}")
             
 # Regi Criminal
 elif sel_menu == "Regi Criminal":
@@ -198,7 +198,7 @@ elif sel_menu == "Regi Criminal":
                     'regi_time'  : utils.get_now_ftime()
                 }
                 req_file = {
-                    'crimi_image': criminal_image
+                    'crimi_face': criminal_image
                 }
                 
                 res = requests.post(submit_url, data=req_data, files=req_file, timeout=10)
@@ -211,6 +211,40 @@ elif sel_menu == "Regi Criminal":
                     
             except Exception as e:
                 st.error(f"Registration failed. Are you connected to the Internet?")
+
+# Del Criminal
+elif sel_menu == "Del Criminal":
+    submit_url = f"{SERVER_URL}/api/del"
+    
+    st.header("Delete Criminal")
+    criminal_name = st.text_input("Criminal name")
+    st.write("Click the delete button, all data of the criminal registered under the entered name will be deleted from the server.")
+    st.write("and The server no longer processes information about deleted criminals.")
+
+    submit_button = st.button(label='Delete')
+    
+    if submit_button:
+        if not criminal_name:
+            st.error("Please enter the criminal name.")
+        else:
+            st.warning("Deleting...")
+            
+            try:
+                req_data = {
+                    'authKey'    : AUTH_KEY,
+                    'crimi_name' : criminal_name
+                }
+                
+                res = requests.post(submit_url, data=req_data, timeout=10)
+                res_json = res.json()
+                
+                if res_json.get('error', True):
+                    st.error(f"Deletion failed: {res_json.get('detail', 'Unknown error')}")
+                else:
+                    st.success(f"Deletion successful: {res_json.get('detail', 'Unknown result')}")
+                    
+            except Exception as e:
+                st.error(f"Deletion failed. Are you connected to the Internet?")
 
 # Rate Plan
 elif sel_menu == "Rate Plan":
