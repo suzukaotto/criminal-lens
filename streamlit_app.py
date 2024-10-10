@@ -42,6 +42,7 @@ elif sel_menu == "View criminals":
     submit_url = f"{SERVER_URL}/api/list"
     
     st.header("View criminals")
+    st.write("Without permission, image data will not be provided.")
     try:
         st.warning("Loading list of criminals...")
         
