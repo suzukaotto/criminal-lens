@@ -182,8 +182,7 @@ elif sel_menu == "Regi Criminal":
             st.image(picture)
             criminal_image = picture
     
-    agree_ckbox = st.checkbox("The information you upload will be stored on the server for processing purposes only. The information you upload may be shared. Do not upload sensitive information. Your IP will be recorded when you register. We will not assume any legal responsibility. If you understand all of the above, please check the box next to it.")
-
+    agree_ckbox = st.checkbox("The information you upload will be stored on the server for processing purposes only. The information you upload may be shared. Do not upload sensitive information. Information that can identify you will also be recorded when you register. The registered information can only be managed (edited, added, deleted, etc.) by the administrator. We do not assume any legal responsibility. If you understand all of the above, please check the box next to it.")
     submit_button = st.button(label='Register')
     
     if submit_button:
