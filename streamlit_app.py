@@ -79,7 +79,7 @@ elif sel_menu == "View criminals":
                                 os.remove(os.path.join(TEMP_DIR, 'view_temp.jpg'))
                             crimi_layout_cell[index].write("Error loading image")
                     else:
-                        crimi_layout_cell[index].write("No image")
+                        crimi_layout_cell[index].write("Image not provided.")
                     
                     crimi_layout_cell[index].write(f"RegiTime: {criminal['regi_time']}")
                     crimi_layout_cell[index].write(f"RegiUser: {criminal['regi_user_name']}")
@@ -146,7 +146,7 @@ elif sel_menu == "Search Criminal":
                             similar_layout_cell[index+3].image(os.path.join(TEMP_DIR, 'search_temp.jpg'), use_column_width=True)
                             os.remove(os.path.join(TEMP_DIR, 'search_temp.jpg'))
                         else:
-                            similar_layout_cell[index+3].write("No image")
+                            similar_layout_cell[index+3].write("Image not provided.")
                         similar_layout_cell[index+3].write("")
                     
                     suspect_layout_cell[0].header("Suspect")
