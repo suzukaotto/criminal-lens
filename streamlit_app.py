@@ -82,14 +82,14 @@ elif sel_menu == "View criminals":
                         crimi_layout_cell[index].write("No image")
                     
                     crimi_layout_cell[index].write(f"RegiTime: {criminal['regi_time']}")
-                    crimi_layout_cell[index].write(f"RegiUser: {criminal['regi_user']}")
+                    crimi_layout_cell[index].write(f"RegiUser: {criminal['regi_user_name']}")
                     
                     crimi_layout_cell[index].write("")
                     crimi_layout_cell[index].write("")
                     crimi_layout_cell[index].write("")
         
     except Exception as e:
-        st.error("Failed to load criminals. Are you connected to the Internet?")
+        st.error(f"Failed to load criminals. Are you connected to the Internet?: {e}")
 
 # Search Criminal
 elif sel_menu == "Search Criminal":
