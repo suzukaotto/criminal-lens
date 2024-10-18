@@ -1,3 +1,3 @@
 # Streamlit App
 For streamlit distribution.<br>
-Main repository: [this](https://github.com/brainai-tteokbokki/criminal-lens)
+Main repository: [https://github.com/brainai-tteokbokki/criminal-lens](https://github.com/brainai-tteokbokki/criminal-lens)
